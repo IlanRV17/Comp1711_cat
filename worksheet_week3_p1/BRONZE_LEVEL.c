@@ -17,6 +17,11 @@ int main() {
      fprintf(file, "The square root of your number is: %d\n" ,totaldata);
 
 
+    int divided_by = totaldata*13;
+    {
+    fprintf("%f\n", divided_by);
+    }
+
     fclose(file);
     return 0;
-}
+    }
