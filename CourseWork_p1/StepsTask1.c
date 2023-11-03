@@ -64,6 +64,8 @@ int main() {
     }
 
     // Reset the file pointer to the beginning of the file
+    // I based this on a discussion with ChatGPT
+    // Prompt: Explain how to seek the number of lines in a separete file. 
     fseek(file, 0, SEEK_SET);
 
     printf("Number of records in file: %d\n", record_counter);
@@ -71,17 +73,20 @@ int main() {
     //Here we assigned date, time and steps their respected values from the file.
     while (fgets(line_buffer, buffer_size, file) != NULL && line_counter < 3) {
 
-        char *date = strtok(line_buffer, ",");
-        char *time = strtok(NULL, ",");
-        char *steps = strtok(NULL, "\n");
+        FITNESS_DATA record[21];
+        char date[11];
+        char time[6];
+        char steps[10];
+
+        tokeniseRecord(line_buffer, ",", date, time, steps);
+    
     //In this code we called the assigned values and turned them into their respective format.
         if (date != NULL && time != NULL && steps != NULL) {
-            printf("%s/%s/%s\n", date, time, steps);
+            printf("%s/%s/%s", date, time, steps);
         } else {
             printf("Error in: %s", line_buffer);
         }
     //Line counter that will determine when to output only three lines.
-
         line_counter++;
     }
 
