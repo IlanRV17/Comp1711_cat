@@ -40,55 +40,29 @@ void tokeniseRecord(const char *input, const char *delimiter,
 // Complete the main function
 int main()
 {
-    // array of daily readings
-    FITNESS_DATA daily_readings[100];
-
-    char line[buffer_size];
-    char filename[buffer_size];
-
-    // get filename from the user
-    printf("Please enter the name of the data file: ");
-
-    // these lines read in a line from the stdin (where the user types)
-    // and then takes the actual string out of it
-    // this removes any spaces or newlines.
-    fgets(line, buffer_size, stdin);
-    sscanf(line, " %s ", filename);
 
     char choice;
     int counter = 0;
     char str;
-    char this_is_a_string[5];
-    //float mean = 0;
-    //float minimum = 100.0;
-    //float max = 0;
+    char this_is_a_string[10];
+    char ch;
+    int minimum = 10000; 
+    int lowest_One;
+    int max = 0;
+    int Biggest_One;
+    float mean = 0;
+    int StreakStart;
+    int starter;
 
-        FILE *input = fopen(filename, "r");
-        if (!input)
-        {
-            printf("Error: File could not be opened\n");
-            return 1;
-        }
+         // array of daily readings
+    FITNESS_DATA daily_readings[1000];
 
-        while (fgets(line, buffer_size, input))
-        {
-
-            // split up the line and store it in the right place
-            // using the & operator to pass in a pointer to the bloodIron so it stores it
-            tokeniseRecord(line, ",", daily_readings[counter].date, daily_readings[counter].time, this_is_a_string);
-
-            daily_readings[counter].steps = atoi(this_is_a_string);
-
-            counter++;
-
-
-        }
-            fclose(input);
-
+    char line[buffer_size];
+    char filename[buffer_size];
 
     while (1)
     {
-        printf("A: Specify the filename to be imported\n");
+        printf("A: Input File Name. \n");
         printf("B: Display the total number of records in the file\n");                
         printf("C: Find the date and time of the timeslot with the fewest steps\n");                
         printf("D: Find the data and time of the timeslot with the largest number of steps\n");                    
@@ -104,6 +78,9 @@ int main()
         while (getchar() != '\n');
 
 
+        printf("Choice: %c\n", choice);
+
+
         // switch statement to control the menu.
         switch (choice)
         {
@@ -111,33 +88,96 @@ int main()
         case 'A':
         case 'a':
 
+    // get filename from the user
+        printf("Please enter the name of the data file: ");
 
-            return 0; 
+    // these lines read in a line from the stdin (where the user types)
+    // and then takes the actual string out of it
+    // this removes any spaces or newlines.
+        fgets(line, buffer_size, stdin);
+        sscanf(line, " %s ", filename);
+
+            FILE *input = fopen(filename, "r");
+            if (!input)
+            {
+                printf("Error: File could not be opened\n");
+                return 1;
+            }
+
+            counter = 0; 
+
+
+            while (fgets(line, buffer_size, input))
+            {
+            // split up the line and store it in the right place
+            // using the & operator to pass in a pointer to the bloodIron so it stores it
+                tokeniseRecord(line, ",", daily_readings[counter].date, daily_readings[counter].time, this_is_a_string);
+
+                daily_readings[counter].steps = atoi(this_is_a_string);
+            
+                counter++;
+            }
+
+
             break;
 
         case 'B':
         case 'b':
-            return 0;
+                
+           printf("Total records: %d\n", counter);
+            
             break;
 
         case 'C':
         case 'c':
-            return 0;
+            for (int i = 0; i < counter; i++)
+            {
+                if (daily_readings[i].steps < minimum) 
+                {
+                    minimum = daily_readings[i].steps;
+                    lowest_One = i;
+                    
+                }
+            }
+            printf("Fewest steps: %s %s\n", daily_readings[lowest_One].date, daily_readings[lowest_One].time);
             break;
 
         case 'D':
         case 'd':
-            return 0;
+            for (int i = 0; i < counter; i++)
+            {
+                if (daily_readings[i].steps > max) 
+                {
+                    max = daily_readings[i].steps;
+                    Biggest_One = i;
+                    
+                }
+            }
+            printf("Largest steps: %s %s\n", daily_readings[Biggest_One].date, daily_readings[Biggest_One].time);
             break;
 
         case 'E':
         case 'e':
-            return 0;
+            for (int i = 0; i < counter; i++)
+            {
+                mean += daily_readings[i].steps;
+            }
+            mean = mean/ counter;
+
+            printf("Mean step count: %.0f\n", mean);
             break;
 
         case 'F':
         case 'f':
-            return 0;
+            for (int i = 0; i < counter; i++)
+            {
+                if (daily_readings[i].steps >= 501);
+                {
+                    StreakStart = daily_readings[i].steps;
+                    starter = i;
+                }
+            }
+            printf("Starter Streak: %d", starter);
             break;
 
         case 'Q':
@@ -151,4 +191,4 @@ int main()
             break;
         }
     }
-}
+} 
