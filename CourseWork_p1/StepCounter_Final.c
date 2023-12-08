@@ -3,6 +3,7 @@
 #include <string.h>
 #include "FitnessDataStruct.h"
 
+
 // Struct moved to header file
 
 // Define any additional variables here
@@ -53,6 +54,10 @@ int main()
     float mean = 0;
     int StreakStart;
     int starter;
+    int currentStreak = 0;
+    int longestStreak = 0;
+    int streakStart = 0;
+    int currentStreakStart = 0;
 
          // array of daily readings
     FITNESS_DATA daily_readings[1000];
@@ -169,17 +174,42 @@ int main()
 
         case 'F':
         case 'f':
-            for (int i = 0; i < counter; i++)
-            {
-                if (daily_readings[i].steps >= 501);
-                {
-                    StreakStart = daily_readings[i].steps;
-                    starter = i;
+            currentStreak = 0;
+            longestStreak = 0;
+            streakStart = 0;
+            currentStreakStart = -1;  // Initialize to -1 to handle the case where the streak starts at the beginning
+
+            for (int i = 0; i < counter; i++) {
+                if (daily_readings[i].steps > 500) {
+                    if (currentStreak == 0) {
+                        currentStreakStart = i;  // Start of a new streak
+                    }
+                    currentStreak++;
+                } else {
+                    if (currentStreak > longestStreak) {
+                        longestStreak = currentStreak;
+                        streakStart = currentStreakStart;
+                    }
+                    currentStreak = 0;  // Reset streak if steps are <= 500
                 }
             }
-            printf("Starter Streak: %d", starter);
-            break;
 
+            // Check for the last streak
+            if (currentStreak > longestStreak) {
+                longestStreak = currentStreak;
+                streakStart = currentStreakStart;
+            }
+
+            if (longestStreak > 0) {
+                printf("Longest period start: %s %s\n",
+                    daily_readings[streakStart].date, daily_readings[streakStart].time);
+                printf("Longest period end: %s %s\n",
+                    daily_readings[streakStart + longestStreak].date,
+                    daily_readings[streakStart + longestStreak].time);
+            } else {
+                printf("No streak above 500 steps found.\n");
+            }
+            break;
         case 'Q':
         case 'q':
             return 0;
@@ -191,4 +221,4 @@ int main()
             break;
         }
     }
-} 
+}
