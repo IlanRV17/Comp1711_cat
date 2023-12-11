@@ -29,12 +29,16 @@ void tokeniseRecord(char *record, char delimiter, char *date, char *time, int *s
 
 // Function to validate the date and time format
 int isValidDateTimeFormat(const char *date, const char *time) {
-    // Add your validation logic here
-    // For simplicity, this example assumes a date format like "MM-DD-YYYY" and a time format like "HH:MM"
-    if (strlen(date) != 10 || date[2] != '-' || date[5] != '-' || strlen(time) != 5 || time[2] != ':') {
+    // Assuming a date format like "YYYY-MM-DD" and a time format like "HH:MM"
+    if (strlen(date) != 10 || date[4] != '-' || date[7] != '-' || strlen(time) != 5 || time[2] != ':') {
         return 0; // Invalid date or time format
     }
     return 1; // Valid date and time format
+}
+
+// Compare function for qsort
+int compareFitnessData(const void *a, const void *b) {
+    return ((FitnessData *)b)->steps - ((FitnessData *)a)->steps;
 }
 
 int main() {
@@ -46,9 +50,6 @@ int main() {
 
     printf("Please enter the name of the data file: ");
 
-    // these lines read in a line from the stdin (where the user types)
-    // and then takes the actual string out of it
-    // this removes any spaces or newlines.
     fgets(line, buffer_size, stdin);
     sscanf(line, " %s ", filename);
 
@@ -61,8 +62,6 @@ int main() {
     int counter = 0;
 
     while (fgets(line, buffer_size, input)) {
-        // split up the line and store it in the right place
-        // using the & operator to pass in a pointer to the bloodIron so it stores it
         char date[11];
         char time[6];
         int steps;
@@ -81,7 +80,27 @@ int main() {
         counter++;
     }
 
-    // Continue with the rest of your code...
-    
+    fclose(input);
+
+    // Sort the data
+    qsort(daily_readings, counter, sizeof(FitnessData), compareFitnessData);
+
+    // Write the sorted data to a new file with .tsv extension
+    strcat(filename, ".tsv");
+    FILE *output = fopen(filename, "w");
+    if (!output) {
+        printf("Error: Unable to create the output file\n");
+        return 1;
+    }
+
+    // Write sorted data to the file
+    for (int i = 0; i < counter; i++) {
+        fprintf(output, "%s\t%s\t%d\n", daily_readings[i].date, daily_readings[i].time, daily_readings[i].steps);
+    }
+
+    fclose(output);
+
+    printf("Sorting and writing to %s successful.\n", filename);
+
     return 0;
 }
